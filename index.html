@@ -14,11 +14,146 @@
 				height: 500px;
 				width: 100%;
 			}
+			#map_linija5 {
+				height: 500px;
+				width: 100%;
+			}
+			#map_linija13 {
+				height: 500px;
+				width: 100%;
+			}
+			#map_linija3 {
+				height: 500px;
+				width: 100%;
+			}
 		</style>
 	</head>
 	<body>
+		<h2>Trenutna lokacija tramvaja 2401 (novi tramvaj)</h2>
+		<div id="map_linija5"></div>
 		<h2>Trenutna lokacija tramvaja linije 5</h2>
 		<div id="map"></div>
+		<h2>Trenutna lokacija tramvaja linije 13</h2>
+		<div id="map_linija13"></div>
+		<h2>Trenutna lokacija tramvaja linije 3</h2>
+		<div id="map_linija3"></div>
+
+		<script>
+			const map3 = L.map("map_linija3").setView(
+				[45.8131696208383, 15.957825798667],
+				14
+			);
+			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+				attribution: "&copy; OpenStreetMap contributors",
+			}).addTo(map3);
+
+			let prvi3 = 0;
+			let markers3 = []; // Spremat će sve markere
+
+			async function fetchTramLocation() {
+				try {
+					const response = await fetch(
+						"https://zet.prometko.cyou/vehicles/locations"
+					);
+					const data = await response.json();
+					const trams = data.features.filter(
+						(f) => f.properties.routeId === "3"
+					);
+					console.log(trams);
+
+					// Prvo uklonimo stare markere
+					markers3.forEach((marker) => map3.removeLayer(marker));
+					markers3 = [];
+
+					let firstTram3 = null;
+
+					for (const tram of trams) {
+						const [lon, lat] = tram.geometry.coordinates;
+
+						if (!firstTram3) {
+							firstTram3 = { lat, lon }; // Sprema prvu lokaciju za kasniju upotrebu
+						}
+
+						// Kreiraj novi marker i dodaj ga na mapu
+						const newMarker13 = L.marker([lat, lon])
+							.addTo(map3)
+							.bindPopup(`Tramvaj ${tram.properties.vehicleId}`);
+
+						markers3.push(newMarker13); // Spremi marker u niz
+					}
+
+					// Ako je prvi tramvaj pronađen, postavi pogled na njegovu lokaciju
+					if (firstTram && prvi3 === 0) {
+						map3.setView([firstTram3.lat, firstTram3.lon], 14);
+						prvi3 = 1;
+					}
+				} catch (error) {
+					console.error("Greška kod dohvaćanja podataka:", error);
+				}
+			}
+
+			fetchTramLocation();
+			setInterval(fetchTramLocation, 500);
+		</script>
+
+		<script>
+			const map2 = L.map("map_linija13").setView(
+				[45.8131696208383, 15.957825798667],
+				14
+			);
+			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+				attribution: "&copy; OpenStreetMap contributors",
+			}).addTo(map2);
+
+			let prvi13 = 0;
+			let markers13 = []; // Spremat će sve markere
+
+			async function fetchTramLocation() {
+				try {
+					const response = await fetch(
+						"https://zet.prometko.cyou/vehicles/locations"
+					);
+					const data = await response.json();
+					const trams = data.features.filter(
+						(f) => f.properties.routeId === "13"
+					);
+					console.log(trams);
+
+					// Prvo uklonimo stare markere
+					markers13.forEach((marker) => map2.removeLayer(marker));
+					markers13 = [];
+
+					let firstTram13 = null;
+
+					for (const tram of trams) {
+						const [lon, lat] = tram.geometry.coordinates;
+
+						if (!firstTram13) {
+							firstTram13 = { lat, lon }; // Sprema prvu lokaciju za kasniju upotrebu
+						}
+
+						// Kreiraj novi marker i dodaj ga na mapu
+						const newMarker13 = L.marker([lat, lon])
+							.addTo(map2)
+							.bindPopup(`Tramvaj ${tram.properties.vehicleId}`);
+
+						markers13.push(newMarker13); // Spremi marker u niz
+					}
+
+					// Ako je prvi tramvaj pronađen, postavi pogled na njegovu lokaciju
+					if (firstTram && prvi13 === 0) {
+						map2.setView([firstTram13.lat, firstTram13.lon], 14);
+						prvi13 = 1;
+					}
+				} catch (error) {
+					console.error("Greška kod dohvaćanja podataka:", error);
+				}
+			}
+
+			fetchTramLocation();
+			setInterval(fetchTramLocation, 500);
+		</script>
+
 		<script>
 			const map = L.map("map").setView([45.8131696208383, 15.957825798667], 14);
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -64,6 +199,47 @@
 					if (firstTram && prvi === 0) {
 						map.setView([firstTram.lat, firstTram.lon], 14);
 						prvi = 1;
+					}
+				} catch (error) {
+					console.error("Greška kod dohvaćanja podataka:", error);
+				}
+			}
+
+			fetchTramLocation();
+			setInterval(fetchTramLocation, 500);
+		</script>
+
+		<script>
+			const map1 = L.map("map_linija5").setView(
+				[45.8131696208383, 15.957825798667],
+				14
+			);
+			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+				attribution: "&copy; OpenStreetMap contributors",
+			}).addTo(map1);
+
+			let marker;
+
+			async function fetchTramLocation() {
+				try {
+					const response = await fetch(
+						"https://zet.prometko.cyou/vehicles/locations"
+					);
+					const data = await response.json();
+					const tram = data.features.find(
+						(f) => f.properties.vehicleId === "102401"
+					);
+
+					if (tram) {
+						const [lon, lat] = tram.geometry.coordinates;
+						if (marker) {
+							marker.setLatLng([lat, lon]);
+						} else {
+							marker = L.marker([lat, lon])
+								.addTo(map1)
+								.bindPopup("Tramvaj 102401");
+						}
+						map1.setView([lat, lon], 14);
 					}
 				} catch (error) {
 					console.error("Greška kod dohvaćanja podataka:", error);
